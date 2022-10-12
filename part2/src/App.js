@@ -5,7 +5,10 @@ import "./App.css";
 
 function App() {
   const [notes, setNotes] = useState([]);
-  const [newNote, setNewNote] = useState("");
+  const [newNote, setNewNote] = useState({
+    title: "",
+    body: "",
+  });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -22,15 +25,18 @@ function App() {
   }, []);
 
   const handleChange = (e) => {
-    setNewNote(e.target.value);
+    setNewNote({
+      ...newNote,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const noteToAddToState = {
-      title: newNote,
-      body: newNote,
+      title: newNote.title,
+      body: newNote.body,
       userId: 1,
     };
 
@@ -41,7 +47,10 @@ function App() {
       .catch((error) => {
         console.log("Ocurrio un error mi llave: ", error);
       });
-    setNewNote("");
+    setNewNote({
+      title: "",
+      body: "",
+    });
   };
 
   return (
@@ -55,7 +64,20 @@ function App() {
       </ol>
 
       <form onSubmit={handleSubmit}>
-        <input type="text" onChange={handleChange} value={newNote} />
+        <input
+          type="text"
+          name="title"
+          placeholder="Title"
+          onChange={handleChange}
+          value={newNote.title}
+        />
+        <input
+          type="text"
+          name="body"
+          placeholder="contenido"
+          value={newNote.body}
+          onChange={handleChange}
+        />
         <button>Crear Nota</button>
       </form>
     </div>
