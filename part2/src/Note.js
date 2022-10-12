@@ -2,10 +2,10 @@ import React from "react";
 
 const Note = ({ note }) => {
   return (
-    <ul>
-      <time>{note.date}</time>
-      <li>{note.content}</li>
-    </ul>
+    <li>
+      <h3>{note.title}</h3>
+      <p>{note.body}</p>
+    </li>
   );
 };
 

@@ -1,10 +1,25 @@
 import Note from "./Note";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getAllNotes, createNote } from "./services/notes/serviceNotes";
 import "./App.css";
 
-function App(props) {
-  const [notes, setNotes] = useState(props.notes);
+function App() {
+  const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+
+    getAllNotes()
+      .then((data) => {
+        setNotes(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log("OCURRIO UN ERROR", error);
+      });
+  }, []);
 
   const handleChange = (e) => {
     setNewNote(e.target.value);
@@ -14,21 +29,30 @@ function App(props) {
     e.preventDefault();
 
     const noteToAddToState = {
-      id: notes.length + 1,
-      content: newNote,
-      date: new Date().toISOString(),
-      important: Math.random() < 0.5,
+      title: newNote,
+      body: newNote,
+      userId: 1,
     };
 
-    setNotes([...notes, noteToAddToState]);
+    createNote(noteToAddToState)
+      .then((data) => {
+        setNotes(([...notes]) => notes.concat(data));
+      })
+      .catch((error) => {
+        console.log("Ocurrio un error mi llave: ", error);
+      });
     setNewNote("");
   };
 
   return (
     <div className="App">
-      {notes.map((note) => (
-        <Note note={note} key={note.id} />
-      ))}
+      <h2>Notes</h2>
+      {loading ? "Cargando" : ""}
+      <ol>
+        {notes.map((note) => (
+          <Note note={note} key={note.id} />
+        ))}
+      </ol>
 
       <form onSubmit={handleSubmit}>
         <input type="text" onChange={handleChange} value={newNote} />
