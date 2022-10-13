@@ -1,20 +1,19 @@
 import axios from "axios";
 
-const API = "https://jsonplaceholder.typicode.com/posts";
+const API = "http://localhost:3001/api/notes";
 
 const getAllNotes = async () => {
   const response = await axios.get(API).then((response) => {
     const { data } = response;
+    console.log(data)
     return data;
   });
   return response;
 };
-const createNote = async ({ title, body, userId }) => {
+const createNote = async ({ content, important }) => {
   const response = await axios
     .post(API, {
-      title,
-      body,
-      userId,
+      content,
     })
     .then(function (response) {
       const { data } = response;
