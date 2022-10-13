@@ -1,6 +1,9 @@
-const http = require("http");
+const express = require("express");
+const app = express();
 
-const notes = [
+app.use(express.json());
+
+let notes = [
   {
     id: 1,
     content: "HTML is easy",
@@ -21,11 +24,64 @@ const notes = [
   },
 ];
 
-const app = http.createServer((request, response) => {
-  response.writeHead(200, { "Content-Type": "application/json" });
-  response.end(JSON.stringify(notes));
+// const app = http.createServer((request, response) => {
+//   response.writeHead(200, { "Content-Type": "application/json" });
+//   response.end(JSON.stringify(notes));
+// });
+
+app.get("/", (req, response) => {
+  response.send("<h1>Hello World</h1>");
+});
+
+app.get("/api/notes", (req, response) => {
+  response.json(notes);
+});
+
+app.get("/api/notes/:id", (req, response) => {
+  const id = Number(req.params.id);
+  const note = notes.find((note) => note.id === id);
+
+  if (note) {
+    response.json(note);
+  } else {
+    response.status(400).end();
+  }
+});
+
+app.delete("/api/notes/:id", (req, response) => {
+  const id = Number(req.params.id);
+  notes = notes.filter((note) => note.id !== id);
+  response.status(204).end();
+});
+
+app.post("/api/notes", (req, response) => {
+  const note = req.body;
+
+  if (!note || !note.content) {
+    return response.status(400).json({
+      error: "note.content is missing",
+    });
+  }
+
+  // const ids = [...notes].length + 1;
+  // const maxId = ids.length + 1;
+
+  const ids = notes.map((note) => note.id);
+  const maxId = Math.max(...ids);
+
+  const newNote = {
+    id: maxId + 1,
+    content: note.content,
+    important: typeof note.important !== "undefined" ? note.important : false,
+    date: new Date().toISOString(),
+  };
+
+  notes = [...notes, newNote];
+
+  response.status(201).json(newNote);
 });
 
 const PORT = 3001;
-app.listen(PORT);
-console.log(`Server running on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
